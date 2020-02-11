@@ -73,6 +73,15 @@ bot.on('message', msg =>{
     }else{
       msg.channel.send("Already debugging in this channel!")
     }
+  }else if(msg.content === ":remove"){
+    var index = server.legal_channels.indexOf(msg.channel.id)
+    if(index > -1){
+      server.legal_channels.splice(index,1)
+      msg.channel.send("This channel is no longer being debugged")
+      updateJson()
+    }else{
+      msg.channel.send("This channel is already not being debugged!")
+    }
   }else{
     if(server.legal_channels.indexOf(msg.channel.id) != -1){
       console.log(channelCountdown[msg.channel.id])
