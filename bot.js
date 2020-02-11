@@ -1,12 +1,28 @@
 var disco = require("discord.js")
+var lodash = require("lodash")
 var fs = require("fs")
 var authContent = fs.readFileSync("auth.json")
-var jsonAuthContent = JSON.parse(content)
-var token = jsonContent.token
+var jsonAuthContent = JSON.parse(authContent)
+var token = jsonAuthContent.token
 var serverContent = fs.readFileSync("serverinfo.json")
 var jsonServerContent = JSON.parse(serverContent)
+console.log(jsonServerContent)
 var serverList = jsonServerContent.servers;
-const { exec } = require('child_process')
+
+var channelTimings = {}
+var channelCountdown = {}
+
+
+function updateJson(){
+  fs.writeFile('serverinfo.json', JSON.stringify(jsonServerContent), 'utf8', error => {
+    if(error){
+      console.error(error);
+    }else{
+      console.log("JSON updated")
+    }
+  });
+}
+
 bot = new disco.Client()
 
 bot.on('ready', () =>{
@@ -16,6 +32,10 @@ bot.on('ready', () =>{
   allGuilds.forEach(server => {
     var isthere = false
     serverList.forEach(recordedServer => {
+      recordedServer.legal_channels.forEach(channel => {
+        channelTimings[channel] = Math.floor(Math.random() * 5) + 1;
+        channelCountdown[channel] = 0;
+      });
       if(recordedServer.id == server.id){
         isthere = true
       }
@@ -27,8 +47,9 @@ bot.on('ready', () =>{
       }
       serverList.push(newServer);
     }
+
   });
-  fs.writeFile('serverinfo.json', jsonServerContent, 'utf8');
+  updateJson()
 })
 
 bot.on('guildCreate', guild => {
@@ -37,11 +58,35 @@ bot.on('guildCreate', guild => {
     legal_channels: []
   }
   serverList.push(newServer);
-  fs.writeFile('serverinfo.json', jsonServerContent, 'utf8');
+  updateJson()
 });
 
 bot.on('message', msg =>{
-  console.log(msg.channel)
+  var server = lodash.filter(serverList, x => x.id = msg.guild.id)[0]
+  if(msg.content === ":debug"){
+    if(server.legal_channels.indexOf(msg.channel.id) == -1){
+      server.legal_channels.push(msg.channel.id)
+      msg.channel.send("Now debugging in this channel")
+      channelTimings[msg.channel.id] = Math.floor(Math.random() * 10);
+      channelCountdown[msg.channel.id] = 0;
+      updateJson()
+    }else{
+      msg.channel.send("Already debugging in this channel!")
+    }
+  }else{
+    if(server.legal_channels.indexOf(msg.channel.id) != -1){
+      console.log(channelCountdown[msg.channel.id])
+      console.log(channelTimings[msg.channel.id])
+      channelCountdown[msg.channel.id] = channelCountdown[msg.channel.id] +
+       Math.ceil(msg.content.length / 75)
+       if(channelCountdown[msg.channel.id] >= channelTimings[msg.channel.id]){
+         msg.channel.send({"files": ["./res/duck.png"]})
+         channelTimings[msg.channel.id] = Math.floor(Math.random() * 5) + 1;
+         channelCountdown[msg.channel.id] = 0;
+       }
+       console.log(msg.channel.id)
+    }
+  }
 })
 
 bot.login(token)
