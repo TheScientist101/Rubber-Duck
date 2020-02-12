@@ -65,7 +65,7 @@ bot.on('guildCreate', guild => {
 
 bot.on('message', msg =>{
   var server = lodash.filter(serverList, x => x.id = msg.guild.id)[0]
-  if(msg.content === ":debug" && msg.member.hasPermission('ADMINISTRAOR')){
+  if(msg.content === ":debug" && msg.member.hasPermission('ADMINISTRATOR')){
     if(server.legal_channels.indexOf(msg.channel.id) == -1){
       server.legal_channels.push(msg.channel.id)
       msg.channel.send("Now debugging in this channel")
@@ -75,7 +75,7 @@ bot.on('message', msg =>{
     }else{
       msg.channel.send("Already debugging in this channel!")
     }
-  }else if(msg.content === ":remove" && msg.member.hasPermission('ADMINISTRAOR')){
+  }else if(msg.content === ":remove" && msg.member.hasPermission('ADMINISTRATOR')){
     var index = server.legal_channels.indexOf(msg.channel.id)
     if(index > -1){
       server.legal_channels.splice(index,1)
