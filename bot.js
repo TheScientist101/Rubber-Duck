@@ -64,7 +64,7 @@ bot.on('guildCreate', guild => {
 });
 
 bot.on('message', msg =>{
-  var server = lodash.filter(serverList, x => x.id = msg.guild.id)[0]
+  var server = lodash.filter(serverList, x => x.id === msg.guild.id)[0]
   if(msg.content === ":debug" && msg.member.hasPermission('ADMINISTRATOR')){
     if(server.legal_channels.indexOf(msg.channel.id) == -1){
       server.legal_channels.push(msg.channel.id)
