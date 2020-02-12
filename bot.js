@@ -32,10 +32,6 @@ bot.on('ready', () =>{
   allGuilds.forEach(server => {
     var isthere = false
     serverList.forEach(recordedServer => {
-      recordedServer.legal_channels.forEach(channel => {
-        channelTimings[channel] = Math.floor(Math.random() * 5) + 1;
-        channelCountdown[channel] = 0;
-      });
       if(recordedServer.id == server.id){
         isthere = true
       }
@@ -50,6 +46,12 @@ bot.on('ready', () =>{
 
   });
   updateJson()
+  serverList.forEach(recordedServer => {
+    recordedServer.legal_channels.forEach(channel => {
+      channelTimings[channel] = Math.floor(Math.random() * 5) + 1;
+      channelCountdown[channel] = 0;
+    });
+  });
 })
 
 bot.on('guildCreate', guild => {
@@ -63,7 +65,7 @@ bot.on('guildCreate', guild => {
 
 bot.on('message', msg =>{
   var server = lodash.filter(serverList, x => x.id = msg.guild.id)[0]
-  if(msg.content === ":debug"){
+  if(msg.content === ":debug" && msg.member.hasPermission('ADMINISTRAOR')){
     if(server.legal_channels.indexOf(msg.channel.id) == -1){
       server.legal_channels.push(msg.channel.id)
       msg.channel.send("Now debugging in this channel")
@@ -73,7 +75,7 @@ bot.on('message', msg =>{
     }else{
       msg.channel.send("Already debugging in this channel!")
     }
-  }else if(msg.content === ":remove"){
+  }else if(msg.content === ":remove" && msg.member.hasPermission('ADMINISTRAOR')){
     var index = server.legal_channels.indexOf(msg.channel.id)
     if(index > -1){
       server.legal_channels.splice(index,1)
@@ -84,8 +86,6 @@ bot.on('message', msg =>{
     }
   }else{
     if(server.legal_channels.indexOf(msg.channel.id) != -1){
-      console.log(channelCountdown[msg.channel.id])
-      console.log(channelTimings[msg.channel.id])
       channelCountdown[msg.channel.id] = channelCountdown[msg.channel.id] +
        Math.ceil(msg.content.length / 75)
        if(channelCountdown[msg.channel.id] >= channelTimings[msg.channel.id]){
@@ -93,7 +93,6 @@ bot.on('message', msg =>{
          channelTimings[msg.channel.id] = Math.floor(Math.random() * 5) + 1;
          channelCountdown[msg.channel.id] = 0;
        }
-       console.log(msg.channel.id)
     }
   }
 })
