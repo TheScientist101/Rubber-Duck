@@ -11,6 +11,9 @@ var serverList = jsonServerContent.servers;
 
 var defaultServerTemplate = {
   "id": "0",
+  "minrand": "1",
+  "maxrand": "5",
+  "msglength": "75",
   "prefix": ":",
   "legal_channels": []
 }
