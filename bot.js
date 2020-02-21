@@ -79,13 +79,18 @@ bot.on('ready', () =>{
     }
 
   });
-  updateJson()
   serverList.forEach(recordedServer => {
+    Object.keys(defaultServerTemplate).forEach(key => {
+      if(!recordedServer.hasOwnProperty(key)){
+        recordedServer[key] = defaultServerTemplate[key]
+      }
+    })
     recordedServer.legal_channels.forEach(channel => {
       channelTimings[channel] = Math.floor(Math.random() * 5) + 1;
       channelCountdown[channel] = 0;
     });
   });
+  updateJson()
 })
 
 bot.on('guildCreate', guild => {
