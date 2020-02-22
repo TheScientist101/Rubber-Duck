@@ -59,6 +59,7 @@ function removeLegalChannel(server, msg){
   if(index > -1){
     server.legal_channels.splice(index,1)
     updateJson()
+    msg.channel.send("This channel is no longer being dubugged!")
   }else{
     msg.channel.send("This channel is already not being debugged!")
   }
