@@ -43,15 +43,25 @@ function sendDuck(msg){
 }
 
 function addLegalChannel(server, channel){
-  server.legal_channels.push(channel.id)
-  channelTimings[channel.id] = Math.floor(Math.random() * 10);
-  channelCountdown[channel.id] = 0;
-  updateJson()
+  if(server.legal_channels.indexOf(channel.id) == -1){
+    server.legal_channels.push(channel.id)
+    channelTimings[channel.id] = Math.floor(Math.random() * 10);
+    channelCountdown[channel.id] = 0;
+    updateJson()
+    channel.send("Now debugging in this channel")
+  }else{
+    channel.send("Already debugging in this channel!")
+  }
 }
 
-function removeLegalChannel(server, index){
-  server.legal_channels.splice(index,1)
-  updateJson()
+function removeLegalChannel(server, msg){
+  let index = server.legal_channels.indexOf(msg.channel.id)
+  if(index > -1){
+    server.legal_channels.splice(index,1)
+    updateJson()
+  }else{
+    msg.channel.send("This channel is already not being debugged!")
+  }
 }
 
 function updateProperty(server, prop, value){
@@ -105,25 +115,14 @@ bot.on('message', msg =>{
   var server = lodash.filter(serverList, x => x.id === msg.guild.id)[0]
   var pref = server.prefix
   if(msg.content.startsWith(pref)  && msg.member.hasPermission('ADMINISTRATOR')){
-    if(msg.content === pref.concat("debug")){
-      if(server.legal_channels.indexOf(msg.channel.id) == -1){
-        addLegalChannel(server, msg.channel)
-        msg.channel.send("Now debugging in this channel")
-      }else{
-        msg.channel.send("Already debugging in this channel!")
-      }
-    }else if(msg.content === pref.concat("remove")){
-      var index = server.legal_channels.indexOf(msg.channel.id)
-      if(index > -1){
-        removeLegalChannel(server, index)
-        msg.channel.send("This channel is no longer being debugged")
-      }else{
-        msg.channel.send("This channel is already not being debugged!")
-      }
-    }else if(msg.content.startsWith(pref.concat("prefix "))){
-      var newPrefix = msg.content.substring(
-        (pref.concat("prefix ")).length, msg.content.length
-      )
+    let args = msg.content.split(" ")
+    let command = args[0].substring(1,args[0].length)
+    if(command == "debug"){
+      addLegalChannel(server, msg.channel)
+    }else if(command == "remove"){
+      removeLegalChannel(server, msg)
+    }else if(command == "prefix"){
+      let newPrefix = args[1]
       updateProperty(server, "prefix", newPrefix)
       msg.channel.send("Prefix has been changed to '".concat(newPrefix).concat("'"))
     }
