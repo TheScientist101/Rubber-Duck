@@ -1,6 +1,7 @@
 var disco = require("discord.js")
 var lodash = require("lodash")
 var fs = require("fs")
+var duckImages = fs.readdirSync("res")
 var authContent = fs.readFileSync("auth.json")
 var jsonAuthContent = JSON.parse(authContent)
 var token = jsonAuthContent.token
@@ -43,7 +44,7 @@ function sendDuck(server, msg){
    channelCountdown[msg.channel.id] = channelCountdown[msg.channel.id] +
    Math.ceil(msg.content.length / parseInt(server.msglength, 10))
    if(channelCountdown[msg.channel.id] >= channelTimings[msg.channel.id]){
-     msg.channel.send({"files": ["./res/duck.png"]})
+     msg.channel.send({"files": ["res/".concat(duckImages[randomRange(0, duckImages.length)])]})
      resetChannelTimings(server, msg.channel.id)
    }
 }
