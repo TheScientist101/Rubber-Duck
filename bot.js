@@ -22,6 +22,13 @@ var channelTimings = {}
 var channelCountdown = {}
 
 
+function randomRange(min, max){
+  return Math.floor(Math.random() * (max-min)) + min
+}
+function resetChannelTimings(server, id){
+  channelTimings[id] = randomRange(parseInt(server.minrand, 10), parseInt(server.maxrand, 10));
+  channelCountdown[id] = 0;
+}
 function updateJson(){
   fs.writeFile('serverinfo.json', JSON.stringify(jsonServerContent), 'utf8', error => {
     if(error){
@@ -32,21 +39,19 @@ function updateJson(){
   });
 }
 
-function sendDuck(msg){
+function sendDuck(server, msg){
    channelCountdown[msg.channel.id] = channelCountdown[msg.channel.id] +
-   Math.ceil(msg.content.length / 75)
+   Math.ceil(msg.content.length / parseInt(server.msglength, 10))
    if(channelCountdown[msg.channel.id] >= channelTimings[msg.channel.id]){
      msg.channel.send({"files": ["./res/duck.png"]})
-     channelTimings[msg.channel.id] = Math.floor(Math.random() * 5) + 1;
-     channelCountdown[msg.channel.id] = 0;
+     resetChannelTimings(server, msg.channel.id)
    }
 }
 
 function addLegalChannel(server, channel){
   if(server.legal_channels.indexOf(channel.id) == -1){
     server.legal_channels.push(channel.id)
-    channelTimings[channel.id] = Math.floor(Math.random() * 10);
-    channelCountdown[channel.id] = 0;
+    resetChannelTimings(server, channel.id)
     updateJson()
     channel.send("Now debugging in this channel")
   }else{
@@ -65,9 +70,10 @@ function removeLegalChannel(server, msg){
   }
 }
 
-function updateProperty(server, prop, value){
+function updateProperty(server, prop, value, msg, displayName){
   server[prop] = value
   updateJson()
+  msg.channel.send(displayName.concat(" has been changed to \"".concat(value).concat("\"")))
 }
 
 bot = new disco.Client()
@@ -96,9 +102,8 @@ bot.on('ready', () =>{
         recordedServer[key] = defaultServerTemplate[key]
       }
     })
-    recordedServer.legal_channels.forEach(channel => {
-      channelTimings[channel] = Math.floor(Math.random() * 5) + 1;
-      channelCountdown[channel] = 0;
+    recordedServer.legal_channels.forEach(id => {
+      resetChannelTimings(recordedServer, id)
     });
   });
   updateJson()
@@ -118,18 +123,22 @@ bot.on('message', msg =>{
   if(msg.content.startsWith(pref)  && msg.member.hasPermission('ADMINISTRATOR')){
     let args = msg.content.split(" ")
     let command = args[0].substring(1,args[0].length)
-    if(command == "debug"){
+    if(command === "debug"){
       addLegalChannel(server, msg.channel)
-    }else if(command == "remove"){
+    }else if(command === "remove"){
       removeLegalChannel(server, msg)
-    }else if(command == "prefix"){
-      let newPrefix = args[1]
-      updateProperty(server, "prefix", newPrefix)
-      msg.channel.send("Prefix has been changed to '".concat(newPrefix).concat("'"))
+    }else if(command === "prefix"){
+      updateProperty(server, "prefix", args[1], msg, "Prefix")
+    }else if(command === "min"){
+      updateProperty(server, "minrand", args[1], msg, "Random Minimum")
+    }else if(command === "max"){
+      updateProperty(server, "maxrand", args[1], msg, "Random Maximum")
+    }else if(command === "length"){
+      updateProperty(server, "msglength", args[1], msg, "Message Length")
     }
   }else{
     if(server.legal_channels.indexOf(msg.channel.id) != -1){
-      sendDuck(msg)
+      sendDuck(server, msg)
     }
   }
 })
