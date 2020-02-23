@@ -24,7 +24,9 @@ var channelCountdown = {}
 
 
 
-function helpMessage(msg, prefix){
+function helpMessage(msg, server){
+  var prefix = server.prefix
+
   var helpMessage = 
   `
   \`\`\`\n
@@ -33,10 +35,10 @@ function helpMessage(msg, prefix){
   ${prefix}help - show this message\n
   ${prefix}debug - add the current channel to the list of channels being observed by the duck\n
   ${prefix}remove - remove the current channel from the list of channels being observed by the duck\n
-  ${prefix}prefix *parameter* - change the server's prefix\n
-  ${prefix}min *parameter* - change the minimum number of message required for the duck to react\n
-  ${prefix}max *parameter* - change the maximum number of message required for the duck to react\n
-  ${prefix}length *parameter* - change what the duck will precieve as the maximum length of a single message\n
+  ${prefix}prefix *parameter* - change the server's prefix  - current value - ${prefix}\n
+  ${prefix}min *parameter* - change the minimum number of message required for the duck to react  - current value - ${server.minrand}\n
+  ${prefix}max *parameter* - change the maximum number of message required for the duck to react  - current value - ${server.maxrand}\n
+  ${prefix}length *parameter* - change what the duck will precieve as the maximum length of a single message  - current value - ${server.msglength}\n
   \`\`\`
   `
 
@@ -138,13 +140,13 @@ bot.on('guildCreate', guild => {
 
 bot.on('message', msg =>{
   if(msg.author.bot) return;
-  var server = lodash.filter(serverList, x => x.id === msg.guild.id)[0]
-  var pref = server.prefix
+  let server = lodash.filter(serverList, x => x.id === msg.guild.id)[0]
+  let pref = server.prefix
   if(msg.content.startsWith(pref)  && msg.member.hasPermission('ADMINISTRATOR')){
     let args = msg.content.split(" ")
     let command = args[0].substring(1,args[0].length)
     if(command === "help"){
-      helpMessage(msg, pref)
+      helpMessage(msg, server)
     }else if(command === "debug"){
       addLegalChannel(server, msg.channel)
     }else if(command === "remove"){
