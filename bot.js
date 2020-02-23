@@ -23,6 +23,25 @@ var channelTimings = {}
 var channelCountdown = {}
 
 
+
+function helpMessage(msg, prefix){
+  var helpMessage = 
+  `
+  \`\`\`\n
+  prefix: "${prefix}"
+  
+  ${prefix}help - show this message\n
+  ${prefix}debug - add the current channel to the list of channels being observed by the duck\n
+  ${prefix}remove - remove the current channel from the list of channels being observed by the duck\n
+  ${prefix}prefix *parameter* - change the server's prefix\n
+  ${prefix}min *parameter* - change the minimum number of message required for the duck to react\n
+  ${prefix}max *parameter* - change the maximum number of message required for the duck to react\n
+  ${prefix}length *parameter* - change what the duck will precieve as the maximum length of a single message\n
+  \`\`\`
+  `
+
+  msg.channel.send(helpMessage)
+}
 function randomRange(min, max){
   return Math.floor(Math.random() * (max-min)) + min
 }
@@ -124,7 +143,9 @@ bot.on('message', msg =>{
   if(msg.content.startsWith(pref)  && msg.member.hasPermission('ADMINISTRATOR')){
     let args = msg.content.split(" ")
     let command = args[0].substring(1,args[0].length)
-    if(command === "debug"){
+    if(command === "help"){
+      helpMessage(msg, pref)
+    }else if(command === "debug"){
       addLegalChannel(server, msg.channel)
     }else if(command === "remove"){
       removeLegalChannel(server, msg)
