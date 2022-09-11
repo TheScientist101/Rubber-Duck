@@ -37,4 +37,8 @@ bot.on('messageCreate', async msg => {
   }
 });
 
+app.listen(8999, () => {
+
+});
+
 bot.login(token)
