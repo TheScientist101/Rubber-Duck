@@ -1,8 +1,8 @@
 var { Client, GatewayIntentBits } = require("discord.js")
 var fs = require("fs")
 var duckImages = fs.readdirSync("public")
-var authContent = require('dotenv').config().parsed
-var token = authContent.TOKEN
+require('dotenv').config()
+var token = process.env.TOKEN
 
 function randomRange(min, max) {
   return Math.floor(Math.random() * (max - min)) + min
