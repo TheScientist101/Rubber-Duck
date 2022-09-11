@@ -1,6 +1,6 @@
 var { Client, GatewayIntentBits } = require("discord.js")
 var fs = require("fs")
-var duckImages = fs.readdirSync("res")
+var duckImages = fs.readdirSync("public")
 var authContent = require('dotenv').config().parsed
 var token = authContent.TOKEN
 
