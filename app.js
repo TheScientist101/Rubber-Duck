@@ -3,6 +3,10 @@ var fs = require("fs")
 var duckImages = fs.readdirSync("public")
 require('dotenv').config()
 var token = process.env.TOKEN
+const express = require('express');
+
+
+const app = express();
 
 function randomRange(min, max) {
   return Math.floor(Math.random() * (max - min)) + min
