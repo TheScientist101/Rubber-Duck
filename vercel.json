@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "name": "nodejs-rubber-duck",
   "builds": [
     { "src": "./app.js", "use": "@vercel/node" }
