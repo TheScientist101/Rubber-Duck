@@ -1,0 +1,24 @@
+{
+  "name": "rubber-duck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheScientist101/Rubber-Duck.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheScientist101/Rubber-Duck/issues"
+  },
+  "homepage": "https://github.com/TheScientist101/Rubber-Duck#readme",
+  "dependencies": {
+    "discord.js": "^14.3.0",
+    "dotenv": "^16.0.2",
+    "lodash": "^4.17.21"
+  }
+}
